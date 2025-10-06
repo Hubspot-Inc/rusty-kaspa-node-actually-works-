@@ -17,6 +17,7 @@ impl TransactionValidator {
         self.check_transaction_inputs_in_isolation(tx)?;
         self.check_transaction_outputs_in_isolation(tx)?;
         self.check_coinbase_in_isolation(tx)?;
+        self.check_transaction_payload_in_isolation(tx)?;
 
         check_transaction_output_value_ranges(tx)?;
         check_duplicate_transaction_inputs(tx)?;
@@ -50,6 +51,14 @@ impl TransactionValidator {
             if output.script_public_key.script().len() > self.coinbase_payload_script_public_key_max_len as usize {
                 return Err(TxRuleError::CoinbaseScriptPublicKeyTooLong(i));
             }
+        }
+        Ok(())
+    }
+
+    fn check_transaction_payload_in_isolation(&self, tx: &Transaction) -> TxResult<()> {
+        // After HF, non-coinbase transactions should not have payloads
+        if !tx.is_coinbase() && !tx.payload.is_empty() {
+            return Err(TxRuleError::NonCoinbaseTxHasPayload);
         }
         Ok(())
     }

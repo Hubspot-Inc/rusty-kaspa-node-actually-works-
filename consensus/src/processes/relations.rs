@@ -95,11 +95,6 @@ pub trait RelationsStoreExtensions: RelationsStore + ChildrenStore {
             return Err(StoreError::HashAlreadyExists(hash));
         }
 
-        // TODO: remove this filter
-        if parents.len() != parents.iter().copied().block_unique().count() {
-            // Since this is rare/unexpected, avoid the collect unless it happens
-            parents = BlockHashes::new(parents.iter().copied().block_unique().collect());
-        }
 
         // Insert a new entry for `hash`
         self.set_parents(&mut writer, hash, parents.clone())?;

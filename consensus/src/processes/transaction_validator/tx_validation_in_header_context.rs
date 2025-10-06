@@ -45,7 +45,6 @@ impl TransactionValidator {
         ctx_daa_score: u64,
         lock_time_arg: LockTimeArg,
     ) -> TxResult<()> {
-        self.check_transaction_payload(tx, ctx_daa_score)?;
         self.check_tx_is_finalized(tx, lock_time_arg)
     }
 
@@ -88,15 +87,4 @@ impl TransactionValidator {
         Ok(())
     }
 
-    fn check_transaction_payload(&self, tx: &Transaction, ctx_daa_score: u64) -> TxResult<()> {
-        // TODO (post HF): move back to in isolation validation
-        if self.payload_activation.is_active(ctx_daa_score) {
-            Ok(())
-        } else {
-            if !tx.is_coinbase() && !tx.payload.is_empty() {
-                return Err(TxRuleError::NonCoinbaseTxHasPayload);
-            }
-            Ok(())
-        }
-    }
 }
