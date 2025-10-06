@@ -89,7 +89,7 @@ function logToId(id, ...args) {
     }
 
     el.innerHTML = args.map((arg) => {
-        return typeof arg === 'object' ? stringify(arg) : arg;
+        return typeof arg === 'object' ? stringify(arg) : escapeHtml(String(arg));
     }).join(' ') + "<br>";
 }
 
@@ -106,7 +106,7 @@ function clearId(id) {
 function log(...args) {
     let el = document.createElement('code');
     el.innerHTML = args.map((arg) => {
-        return typeof arg === 'object' ? stringify(arg) : arg;
+        return typeof arg === 'object' ? stringify(arg) : escapeHtml(String(arg));
     }).join(' ') + "<br>";
     document.body.appendChild(el);
 }
@@ -132,5 +132,3 @@ function stringify(json) {
         return '<span class="' + cls + '">' + match + '</span>';
     });
 }
-
-export { log, logToId, clearId, randomId, stringify, currentNetwork, disconnectHandler };
