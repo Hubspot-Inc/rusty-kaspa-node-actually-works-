@@ -3,7 +3,9 @@
 //!
 use super::{extensions::ReachabilityStoreIntervalExtensions, inquirer::*, reindex::ReindexOperationContext, *};
 use crate::model::stores::reachability::ReachabilityStore;
+use kaspa_core::trace;
 use kaspa_hashes::Hash;
+use std::time::Instant;
 
 /// Adds `new_block` as a child of `parent` in the tree structure. If this block
 /// has no remaining interval to allocate, a reindexing is triggered. When a reindexing
@@ -26,10 +28,13 @@ pub fn add_tree_block(
         //       which comes exactly at the end of current capacity
         store.insert(new_block, parent, remaining, parent_height + 1)?;
 
-        // Start a reindex operation (TODO: add timing)
+        // Start a reindex operation
+        let reindex_start = Instant::now();
         let reindex_root = store.get_reindex_root()?;
         let mut ctx = ReindexOperationContext::new(store, reindex_depth, reindex_slack);
         ctx.reindex_intervals(new_block, reindex_root)?;
+        let reindex_duration = reindex_start.elapsed();
+        trace!("Reachability reindex operation completed in {:?}", reindex_duration);
     } else {
         let allocated = remaining.split_half().0;
         store.insert(new_block, parent, allocated, parent_height + 1)?;

@@ -5,13 +5,19 @@ use kaspa_core::{
 };
 use kaspa_utils::networking::{NetAddress, PeerId};
 
+// P2P Service flags
+pub const NODE_NETWORK: u64 = 1 << 0;        // Node can serve the complete block chain
+pub const NODE_BLOOM: u64 = 1 << 1;          // Node supports bloom filtering
+pub const NODE_WITNESS: u64 = 1 << 3;        // Node can serve witness data
+pub const NODE_COMPACT_FILTERS: u64 = 1 << 6; // Node supports compact block filters
+
 /// Maximum allowed length for the user agent field in a version message `VersionMessage`.
 pub const MAX_USER_AGENT_LEN: usize = 256;
 
 pub struct Version {
     pub protocol_version: u32,
     pub network: String,
-    pub services: u64, // TODO
+    pub services: u64,
     pub timestamp: u64,
     pub address: Option<NetAddress>,
     pub id: PeerId,
@@ -31,7 +37,7 @@ impl Version {
         Self {
             protocol_version,
             network,
-            services: 0, // TODO: get number of live services
+            services: NODE_NETWORK | NODE_BLOOM | NODE_WITNESS | NODE_COMPACT_FILTERS,
             timestamp: unix_now(),
             address,
             id,

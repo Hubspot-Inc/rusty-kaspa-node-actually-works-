@@ -133,7 +133,6 @@ impl Prefix {
     }
 
     /// Validate that the given prefix string is well-formed.
-    // TODO(tarcieri): validate the string ends with `prv` or `pub`?
     pub(crate) const fn validate_str(s: &str) -> crate::error::ResultConst<&str> {
         if s.len() != Self::LENGTH {
             return Err(crate::error::ErrorImpl::DecodeInvalidLength);
@@ -149,7 +148,12 @@ impl Prefix {
             }
         }
 
-        Ok(s)
+        // Validate that the string ends with `prv` or `pub`
+        if s.ends_with("prv") || s.ends_with("pub") {
+            Ok(s)
+        } else {
+            Err(crate::error::ErrorImpl::DecodeInvalidStr)
+        }
     }
 }
 
